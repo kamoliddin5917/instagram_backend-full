@@ -38,10 +38,9 @@ module.exports = {
       let medias = req.files.map((e) => (e = e.filename));
 
       const createPost = await model.createPost(name, medias, userId);
-
       if (!createPost) return res.status(400).json({ message: "Bad request!" });
-
       res.status(201).json({ message: "Post created!", createPost });
+      console.log("cors");
     } catch (error) {
       res.status(500).json({ message: "Server ERROR!" });
     }
@@ -149,6 +148,7 @@ module.exports = {
         .status(200)
         .json({ message: "exit", deletedUser: deletedUser.user_id });
     } catch (error) {
+      console.log(error.message, "exit");
       res.status(500).json({ message: "Server ERROR!" });
     }
   },
