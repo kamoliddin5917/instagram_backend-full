@@ -5,7 +5,7 @@ const { PORT } = require("./config/server");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: "https://thismyinstagram.herokuapp.com/" }));
 app.use(express.json());
 app.use("/media", express.static(path.join(__dirname, "./uploads")));
 // app.use(require("./middlewares/auth").AUTH);
