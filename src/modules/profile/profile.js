@@ -183,7 +183,7 @@ module.exports = {
 
       if (!password) return res.status(400).json({ message: "Bad request!" });
 
-      const pass = await comparePassword(newPassword, password.user_password);
+      const pass = await comparePassword(oldPassword, password.user_password);
 
       if (!pass) return res.status(400).json({ message: "Bad request!" });
 
