@@ -2,6 +2,7 @@ const model = require("./model");
 const { verify } = require("../../utils/jwt");
 const fs = require("fs");
 const path = require("path");
+const { hashPassword, comparePassword } = require("../../utils/bcrypt");
 
 module.exports = {
   GET: async (req, res) => {
@@ -149,6 +150,52 @@ module.exports = {
         .json({ message: "exit", deletedUser: deletedUser.user_id });
     } catch (error) {
       console.log(error.message, "exit");
+      res.status(500).json({ message: "Server ERROR!" });
+    }
+  },
+  PASSWORD_UPDATE: async (req, res) => {
+    try {
+      const { email, oldPassword, newPassword, newPasswordTwo } = req.body;
+      const { token } = req.headers;
+      const { userId } = verify(token);
+      if (
+        !userId ||
+        !email ||
+        !oldPassword ||
+        !newPassword ||
+        !newPasswordTwo ||
+        newPassword !== newPasswordTwo ||
+        oldPassword === newPassword
+      )
+        return res.status(400).json({ message: "Bad request!" });
+
+      if (
+        !newPassword.match(
+          /^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[a-zA-Z0-9!@#$%^&*]{7,17}$/
+        )
+      )
+        return res.status(400).json({
+          message:
+            "Kamida 7 ta belgi, ko'pi bn 17 ta belgi, kotta-kichkina harf, belgi, son bo'lishi kerak!",
+        });
+
+      const password = await model.password(email, userId);
+
+      if (!password) return res.status(400).json({ message: "Bad request!" });
+
+      const pass = await comparePassword(newPassword, password.user_password);
+
+      if (!pass) return res.status(400).json({ message: "Bad request!" });
+
+      const hashedPassword = await hashPassword(newPassword);
+
+      const updatePassword = await model.updatePassword(hashedPassword, userId);
+
+      if (!updatePassword)
+        return res.status(500).json({ message: "Server error!" });
+
+      res.status(200).json({ message: "Password update", updatePassword });
+    } catch (error) {
       res.status(500).json({ message: "Server ERROR!" });
     }
   },

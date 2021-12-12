@@ -21,6 +21,11 @@ const UPDATE_PROFILE =
   "UPDATE users SET user_firstname = $1, user_lastname = $2, user_image = $3 WHERE user_id = $4 RETURNING user_firstname, user_lastname, user_image";
 const DELETED_USER =
   "UPDATE users SET user_status = '!active' WHERE user_id = $1 RETURNING user_id, user_image";
+// PASSWORD UPDATE
+const FIND_PASSWORD =
+  "SELECT user_password FROM users WHERE user_email = $1 AND user_id = $2 AND user_status = 'active'";
+const UPDATE_PASSWORD =
+  "UPDATE users SET user_password = $1 WHERE user_id = $2 RETURNING user_id";
 
 //  POST
 const getUser = (...values) => fetch(GET_USER, values);
@@ -32,6 +37,9 @@ const deletedPost = (...values) => fetch(DELETED_POST, values);
 // PROFILE
 const updateUser = (...values) => fetch(UPDATE_PROFILE, values);
 const deletedUser = (...values) => fetch(DELETED_USER, values);
+// PASSWORD UPDATE
+const password = (...values) => fetch(FIND_PASSWORD, values);
+const updatePassword = (...values) => fetch(UPDATE_PASSWORD, values);
 
 module.exports = {
   getUser,
@@ -42,4 +50,6 @@ module.exports = {
   deletedPost,
   updateUser,
   deletedUser,
+  password,
+  updatePassword,
 };

@@ -18,6 +18,7 @@ router
 
   .put("/profile", auth.AUTH, upload.single("image"), controller.PROFILE_UPDATE)
   .put("/profile/post", auth.AUTH, controller.POST_UPDATE)
+  .put("/profile/password", auth.AUTH, controller.PASSWORD_UPDATE)
 
   .delete("/profile/post/:postId", auth.AUTH, controller.POST_DELETE)
   .delete("/profile", auth.AUTH, controller.EXIT);

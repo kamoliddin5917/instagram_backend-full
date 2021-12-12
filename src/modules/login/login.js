@@ -14,7 +14,6 @@ module.exports = {
 
       if (!findUser) return res.status(400).json({ message: "Bad request!" });
 
-      console.log("login");
       const comparePass = await comparePassword(
         password,
         findUser.user_password
