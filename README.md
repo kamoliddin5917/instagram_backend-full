@@ -38,6 +38,8 @@ headers = { token }
 
 2. url/api/profile/post
    body = { name, postId }
+3. url/api/profile/password
+   body = { email, oldPassword, newPassword, newPasswordTwo } -- password yengilash
 
 # DELETE
 
