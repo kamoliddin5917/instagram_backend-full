@@ -1,7 +1,10 @@
 const model = require("./model");
 const { verify } = require("../../utils/jwt");
+const { ee } = require("../../event/event");
 
 module.exports = {
+  ee,
+
   POST: async (req, res) => {
     try {
       const { commentId } = req.params;
@@ -23,6 +26,8 @@ module.exports = {
         if (!createCommentComment)
           return res.status(400).json({ message: "Bad request!" });
 
+        ee.emit("CREATE_COMMENT", createCommentComment);
+
         return res
           .status(201)
           .json({ message: "Comment created!", createCommentComment });
@@ -32,6 +37,8 @@ module.exports = {
 
       if (!createComment)
         return res.status(400).json({ message: "Bad request!" });
+
+      ee.emit("CREATE_COMMENT", createComment);
 
       res.status(201).json({ message: "Comment created!", createComment });
     } catch (error) {

@@ -1,10 +1,13 @@
 const model = require("./model");
 const { verify } = require("../../utils/jwt");
-const fs = require("fs");
-const path = require("path");
 const { hashPassword, comparePassword } = require("../../utils/bcrypt");
+const { ee } = require("../../event/event");
+// const fs = require("fs");
+// const path = require("path");
 
 module.exports = {
+  ee,
+
   GET: async (req, res) => {
     try {
       const { token } = req.headers;
@@ -24,24 +27,27 @@ module.exports = {
         profile: { user: getUser, posts: getPosts, comments: getComments },
       });
     } catch (error) {
-      console.log(error.message);
       res.status(500).json({ message: "Server ERROR!" });
     }
   },
   POST_CREATE: async (req, res) => {
     try {
-      const { name } = req.body;
+      const { name, media } = req.body;
       const { token } = req.headers;
       const { userId } = verify(token);
-      if (!name || !userId || !req.files.length)
+      if (!name || !userId || !media)
         return res.status(400).json({ message: "Bad request!" });
 
-      let medias = req.files.map((e) => (e = e.filename));
+      // let medias = req.files.map((e) => (e = e.filename));
+      let medias = [media];
 
       const createPost = await model.createPost(name, medias, userId);
+
       if (!createPost) return res.status(400).json({ message: "Bad request!" });
+
+      ee.emit("CREATE_POST", createPost);
+
       res.status(201).json({ message: "Post created!", createPost });
-      console.log("cors");
     } catch (error) {
       res.status(500).json({ message: "Server ERROR!" });
     }
@@ -78,26 +84,24 @@ module.exports = {
       if (!deletedPost)
         return res.status(400).json({ message: "Bad request!" });
 
-      deletedPost.post_media.forEach((media) => {
-        fs.unlink(path.join(__dirname, "../../uploads", media), (er) => {
-          console.log(er);
-        });
-      });
+      // deletedPost.post_media.forEach((media) => {
+      //   fs.unlink(path.join(__dirname, "../../uploads", media), (er) => {
+      //     console.log(er);
+      //   });
+      // });
 
-      res
-        .status(200)
-        .json({ message: "Post deleted!", deletedPost: deletedPost.post_id });
+      res.status(200).json({ message: "Post deleted!", deletedPost });
     } catch (error) {
       res.status(500).json({ message: "Server ERROR!" });
     }
   },
   PROFILE_UPDATE: async (req, res) => {
     try {
-      const { firstName, lastName } = req.body;
+      const { firstName, lastName, image } = req.body;
       const { token } = req.headers;
       const { userId } = verify(token);
 
-      if ((!firstName && !lastName && !req.file) || !userId)
+      if ((!firstName && !lastName && !image) || !userId)
         return res.status(400).json({ message: "Bad request!" });
 
       const getUser = await model.getUser(userId);
@@ -107,22 +111,24 @@ module.exports = {
       const updateUser = await model.updateUser(
         firstName || getUser.user_firstname,
         lastName || getUser.user_lastname,
-        req.file ? req.file.filename : getUser.user_image,
+        image || getUser.user_image,
         userId
       );
 
       if (!updateUser) return res.status(400).json({ message: "Bad request!" });
 
-      if (req.file) {
-        fs.unlink(
-          path.join(__dirname, "../../uploads", getUser.user_image),
-          (er) => {
-            console.log(er);
-          }
-        );
-      }
+      // if (req.file) {
+      //   fs.unlink(
+      //     path.join(__dirname, "../../uploads", getUser.user_image),
+      //     (er) => {
+      //       console.log(er);
+      //     }
+      //   );
+      // }
 
-      res.status(200).json({ message: "Profile update", updateUser });
+      const img = image ? getUser.user_image : null;
+
+      res.status(200).json({ message: "Profile update", updateUser, img: img });
     } catch (error) {
       res.status(500).json({ message: "Server ERROR!" });
     }
@@ -138,18 +144,15 @@ module.exports = {
       if (!deletedUser)
         return res.status(400).json({ message: "Bad request!" });
 
-      fs.unlink(
-        path.join(__dirname, "../../uploads", deletedUser.user_image),
-        (er) => {
-          console.log(er);
-        }
-      );
+      // fs.unlink(
+      //   path.join(__dirname, "../../uploads", deletedUser.user_image),
+      //   (er) => {
+      //     console.log(er);
+      //   }
+      // );
 
-      res
-        .status(200)
-        .json({ message: "exit", deletedUser: deletedUser.user_id });
+      res.status(200).json({ message: "exit", deletedUser });
     } catch (error) {
-      console.log(error.message, "exit");
       res.status(500).json({ message: "Server ERROR!" });
     }
   },

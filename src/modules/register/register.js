@@ -1,8 +1,11 @@
 const model = require("./model");
 const { sign } = require("../../utils/jwt");
 const { hashPassword } = require("../../utils/bcrypt");
+const { ee } = require("../../event/event");
 
 module.exports = {
+  ee,
+
   POST: async (req, res) => {
     try {
       const { firstName, lastName, email, password } = req.body;
@@ -38,9 +41,10 @@ module.exports = {
 
       const token = sign({ userId: createdUser.user_id });
 
+      ee.emit("CREATE_USER", createdUser);
+
       res.status(201).json({ message: "User created!", token });
     } catch (error) {
-      console.log(error.message, "ok");
       res.status(400).json({ message: "Bad request!" });
     }
   },

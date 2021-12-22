@@ -26,8 +26,6 @@ module.exports = {
 
       res.status(200).json({ message: "User find!", token });
     } catch (error) {
-      console.log(error.message, "login");
-
       res.status(500).json({ message: "Server ERROR!" });
     }
   },

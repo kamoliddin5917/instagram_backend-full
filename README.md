@@ -1,8 +1,10 @@
 # instagram documentation
 
+# (--- ---) - ichidigila o'zgardi filela firebasega joylab linkini jo'natiladi
+
 URL = "https://thismyinstagram.herokuapp.com"
 
-image and video src = "url/media" + img or video -- src atributiga img bo'sa img tagiga video bo'sa video tagiga qo'yish kerak
+(--- image and video src = "url/media" + img or video -- src atributiga img bo'sa img tagiga video bo'sa video tagiga qo'yish kerak ---)
 
 # token shart bo'lmaganlari
 
@@ -25,7 +27,7 @@ headers = { token }
 # POST
 
 1. url/api/profile/post
-   body = { media, name } -- formdata da jo'natish kerak
+   body = { media, name } -- (--- formdata da jo'natish kerak ---) - firebasega joylab media dan link jo'natish kerak
 2. url/api/comment
    body = { comment, postId } -- postga comment yozish
 3. url/api/comment/{commentId}
@@ -34,7 +36,7 @@ headers = { token }
 # PUT
 
 1. url/api/profile
-   body = { firstName, lastName, image } -- holaganini o'zgartirsa bo'ladi, agar image jo'natilsa formdatadan jo'natish kerak
+   body = { firstName, lastName, image } -- holaganini o'zgartirsa bo'ladi, agar image jo'natilsa (--- formdatadan ---) firebasega imageni joylab image dan link jo'natish kerak
 
 2. url/api/profile/post
    body = { name, postId }
